@@ -71,13 +71,16 @@ def get_prayer_times_with_ends(target_date_obj_override=None):
     options = Options()
     options.add_argument("--headless")
     options.add_argument("--disable-gpu")
-    
-    if not BRAVE_PATH: 
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36")
-    else: 
-        options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36")
+    options.add_argument("--no-sandbox") # Critical for sandbox issues
+    options.add_argument("--disable-dev-shm-usage") # Often needed in Linux/Docker, can help generally
+    options.add_argument("--disable-extensions") # Reduce overhead
+    options.add_argument("--disable-browser-side-navigation") # Improve stability
+    options.add_argument("--disable-setuid-sandbox") # Another sandbox-related flag
+    options.add_argument("--disable-infobars") # Prevent info bars (e.g., "Chrome is being controlled by automated test software")
+    options.add_argument("--disable-blink-features=AutomationControlled") # Try to avoid detection
+    options.add_experimental_option("excludeSwitches", ["enable-automation"]) # Another anti-detection flag
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36")
+    options.add_argument("--log-level=3")
 
     driver = None
     scraped_times_raw = {label: None for label in ALL_TIME_LABELS_TO_SCRAPE}

@@ -21,7 +21,7 @@
         "token_path": "token.json",
         "credentials_path": "credentials.json",
         "scopes": ["https://www.googleapis.com/auth/calendar"],
-        "redirect_uri": "http://localhost:8080/",
+        "redirect_uri": "https://localhost:8080/",
         "server_port": 8080
     },
     "processing_days_in_advance": 7
