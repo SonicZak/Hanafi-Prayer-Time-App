@@ -1,0 +1,28 @@
+{
+    "brave_path": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe",
+    "calendar_id": "7995574435af48d968ca2a79e79a8299af33cb9140eec25fd363af2c0c652f55@group.calendar.google.com",
+    "target_timezone": "Australia/Sydney",
+    "event_reminder_minutes": 5,
+    "muwaqqit_base_url": "https://www.muwaqqit.com/index?add=1-3+Kennington+Oval%2C+Auburn+NSW+2144%2C+Australia&diptype=apparent&dn=&ea=-19.0&eh=33.0&ehtype=observer&eo=33.0&era=-16.0&fa=-19.0&fea=1.0&ia=4.5&isn=-10.0&isna=1.0&k=0.155&ln=151.0216332&lt=-33.8718789&p=1010.0&q=&rsa=1.0&t=15.0&tz=Australia%2FSydney&tztype=auto&vc=5.65&z=17&zt=1.0",
+    "prayer_definitions": {
+        "Fajr":    {"start_text": "Fajr",                       "end_text": "Shurūq/Sunrise"},
+        "Zuhr":    {"start_text": "Ẓuhr",                       "end_text": "ʿAṣr al-Mithl al‑Thānī"},
+        "Asr":     {"start_text": "ʿAṣr al-Mithl al‑Thānī",      "end_text": "Karāhah"},
+        "Maghrib": {"start_text": "Maghrib/Sunset",             "end_text": "Ishtibāk al‑Nujūm"},
+        "Isha":    {"start_text": "ʿIshāʾ al-Shafaq al-Abyaḍ",    "end_text": "Half sharʿī night"}
+    },
+    "managed_prayer_names": ["Fajr", "Zuhr", "Asr", "Maghrib", "Isha"],
+    "timeouts": {
+        "overall_process_seconds": 60.0,
+        "page_load_seconds": 25.0,
+        "additional_delay_seconds": 5.0
+    },
+    "google_auth": {
+        "token_path": "token.json",
+        "credentials_path": "credentials.json",
+        "scopes": ["https://www.googleapis.com/auth/calendar"],
+        "redirect_uri": "http://localhost:8080/",
+        "server_port": 8080
+    },
+    "processing_days_in_advance": 7
+}
