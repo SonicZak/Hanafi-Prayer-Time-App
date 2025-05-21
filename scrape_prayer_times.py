@@ -49,7 +49,25 @@ if PRAYER_DEFINITIONS:
 ALL_TIME_LABELS_TO_SCRAPE = {label for label in ALL_TIME_LABELS_TO_SCRAPE if label is not None}
 
 
-def get_prayer_times_with_ends(target_date_obj_override=None): # <<<<< THIS LINE
+def get_prayer_times_with_ends(target_date_obj_override=None):
+    """
+    Scrapes prayer start and end times from the configured website for a specific date.
+
+    Uses Selenium to navigate the website, wait for elements, and extract time data.
+    Handles date offsets for prayers that might cross midnight (e.g., Isha end).
+
+    Args:
+        target_date_obj_override (datetime.date, optional): An optional date object
+            to scrape times for. If None, it defaults to the current date in the
+            configured target timezone.
+
+    Returns:
+        dict or None: A dictionary containing prayer times and associated dates
+                      (start, end, date_for_start, date_for_end) for each defined prayer
+                      (e.g., Fajr, Zuhr, etc.) if scraping is successful and all
+                      required times are found. Returns None if scraping fails
+                      or incomplete data is found.
+    """
     options = Options()
     options.add_argument("--headless")
     options.add_argument("--disable-gpu")

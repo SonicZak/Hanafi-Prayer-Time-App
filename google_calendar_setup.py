@@ -38,6 +38,17 @@ SERVER_PORT = google_auth_config.get('server_port', 8080)
 
 
 def authenticate_google_calendar():
+    """
+    Authenticates with the Google Calendar API.
+    
+    It attempts to load existing credentials from TOKEN_PATH.
+    If expired, it refreshes the token. If no valid token exists,
+    it initiates the OAuth 2.0 flow to obtain new credentials via a local server.
+    
+    Returns:
+        googleapiclient.discovery.Resource: A Google Calendar API service object if authentication is successful,
+                                           otherwise None.
+    """
     creds = None
     if os.path.exists(TOKEN_PATH):
         with open(TOKEN_PATH, 'rb') as token:

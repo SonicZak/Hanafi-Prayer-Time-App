@@ -40,6 +40,20 @@ if not isinstance(DAYS_TO_PROCESS_IN_ADVANCE, int) or DAYS_TO_PROCESS_IN_ADVANCE
 
 
 def get_existing_prayer_events_for_day(service, target_date_obj, target_tz):
+    """
+    Retrieves existing managed prayer events from the Google Calendar for a specific day.
+
+    Args:
+        service (googleapiclient.discovery.Resource): The authenticated Google Calendar API service.
+        target_date_obj (datetime.date): The date object for which to fetch events.
+        target_tz (pytz.timezone): The timezone object for the target date.
+
+    Returns:
+        dict: A dictionary where keys are event summaries (e.g., 'Fajr Prayer')
+              and values are the Google Calendar event resource objects for
+              existing managed prayer events on that day. Returns an empty dict
+              if an error occurs or no events are found.
+    """
     print(f"Listing existing prayer events on {target_date_obj.strftime('%Y-%m-%d')}...")
     day_start_naive = datetime.combine(target_date_obj, dt_time.min)
     day_end_naive = datetime.combine(target_date_obj, dt_time.max)
@@ -79,7 +93,7 @@ def get_existing_prayer_events_for_day(service, target_date_obj, target_tz):
     print(f"Found {len(existing_events_map)} managed prayer events for {target_date_obj.strftime('%Y-%m-%d')}.")
     return existing_events_map
 
-def create_or_update_prayer_event(service, prayer_name, start_dt_aware, end_dt_aware, date_str_for_desc_url, existing_event_data=None):
+def create_or_update_prayer_event(service, prayer_name, start_dt_aware, end_dt_aware, date_str_for_desc_url, target_tz, existing_event_data=None):
     event_summary = f'{prayer_name} Prayer'
     event_description = f"Time for {prayer_name} prayer.\nURL for this day's times: {MUWAQQIT_BASE_URL_FOR_DESC}&d={date_str_for_desc_url}"
 
@@ -94,7 +108,8 @@ def create_or_update_prayer_event(service, prayer_name, start_dt_aware, end_dt_a
         'description': event_description,
     }
 
-    target_tz_for_comparison = pytz.timezone(TARGET_TIMEZONE_STR) # Define for comparison
+    existing_start_dt = datetime.fromisoformat(existing_start_str).astimezone(target_tz)
+    existing_end_dt = datetime.fromisoformat(existing_end_str).astimezone(target_tz)
 
     if existing_event_data:
         try:
@@ -200,6 +215,7 @@ def main():
                     start_datetime_aware, 
                     end_datetime_aware, 
                     start_date_str, # Date for description URL (should be same as current_processing_date_str or one day after for Isha end)
+                    target_tz,
                     existing_event_data=existing_event_to_update
                 )
 
