@@ -108,16 +108,13 @@ def create_or_update_prayer_event(service, prayer_name, start_dt_aware, end_dt_a
         'description': event_description,
     }
 
-    existing_start_dt = datetime.fromisoformat(existing_start_str).astimezone(target_tz)
-    existing_end_dt = datetime.fromisoformat(existing_end_str).astimezone(target_tz)
-
     if existing_event_data:
         try:
             existing_start_str = existing_event_data.get('start', {}).get('dateTime')
             existing_end_str = existing_event_data.get('end', {}).get('dateTime')
             
-            existing_start_dt = datetime.fromisoformat(existing_start_str).astimezone(target_tz_for_comparison)
-            existing_end_dt = datetime.fromisoformat(existing_end_str).astimezone(target_tz_for_comparison)
+            existing_start_dt = datetime.fromisoformat(existing_start_str).astimezone(target_tz)
+            existing_end_dt = datetime.fromisoformat(existing_end_str).astimezone(target_tz)
 
             needs_update = (
                 existing_start_dt != start_dt_aware or
