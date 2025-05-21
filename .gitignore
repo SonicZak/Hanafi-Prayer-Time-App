@@ -13,6 +13,9 @@ chromedriver-win64/
 credentials.json
 token.json
 
+# Batch files
+*.bat
+
 # Distribution / packaging
 .Python
 build/
