@@ -5,7 +5,7 @@ from scrape_prayer_times import get_prayer_times_with_ends # This will be called
 from datetime import datetime, timedelta, time as dt_time
 import pytz
 from config_loader import load_config
-import sys # For sys.exit
+import sys
 
 # Load configuration
 try:
@@ -20,7 +20,6 @@ EVENT_REMINDER_MINUTES = config.get('event_reminder_minutes', 0)
 TARGET_TIMEZONE_STR = config.get('target_timezone')
 MANAGED_PRAYER_NAMES = config.get('managed_prayer_names')
 MUWAQQIT_BASE_URL_FOR_DESC = config.get('muwaqqit_base_url')
-# THIS IS THE KEY FOR N-DAY PROCESSING
 DAYS_TO_PROCESS_IN_ADVANCE = config.get('processing_days_in_advance', 1) # Default to 1 if not in config
 
 # Validate critical configurations
@@ -85,11 +84,11 @@ def get_existing_prayer_events_for_day(service, target_date_obj, target_tz):
                 break
         except HttpError as e:
             print(f"API error listing events for {target_date_obj.strftime('%Y-%m-%d')}: {e}")
-            return {} 
+            return {}
         except Exception as e_list:
             print(f"Unexpected error listing events for {target_date_obj.strftime('%Y-%m-%d')}: {e_list}")
             return {}
-            
+
     print(f"Found {len(existing_events_map)} managed prayer events for {target_date_obj.strftime('%Y-%m-%d')}.")
     return existing_events_map
 
@@ -112,7 +111,7 @@ def create_or_update_prayer_event(service, prayer_name, start_dt_aware, end_dt_a
         try:
             existing_start_str = existing_event_data.get('start', {}).get('dateTime')
             existing_end_str = existing_event_data.get('end', {}).get('dateTime')
-            
+
             existing_start_dt = datetime.fromisoformat(existing_start_str).astimezone(target_tz)
             existing_end_dt = datetime.fromisoformat(existing_end_str).astimezone(target_tz)
 
@@ -122,7 +121,7 @@ def create_or_update_prayer_event(service, prayer_name, start_dt_aware, end_dt_a
             )
         except Exception as e_comp:
             print(f"Error comparing event data for {event_summary} on {date_str_for_desc_url}, forcing update: {e_comp}")
-            needs_update = True 
+            needs_update = True
 
         if needs_update:
             try:
@@ -136,7 +135,7 @@ def create_or_update_prayer_event(service, prayer_name, start_dt_aware, end_dt_a
                 print(f"Unexpected error updating event for {prayer_name} on {date_str_for_desc_url}: {e_upd}")
         else:
             print(f"Event for {prayer_name} on {date_str_for_desc_url} is already up-to-date. No action taken.")
-    else: 
+    else:
         try:
             print(f"Creating new event for {prayer_name} on {date_str_for_desc_url}...")
             created_event = service.events().insert(calendarId=CALENDAR_ID, body=event_body).execute()
@@ -149,77 +148,90 @@ def create_or_update_prayer_event(service, prayer_name, start_dt_aware, end_dt_a
 
 def main():
     print("Starting Prayer Calendar Manager...")
-    gcal_service = authenticate_google_calendar()
-    if not gcal_service:
-        print("Failed to authenticate with Google Calendar. Exiting.")
-        return
+    try:
+        gcal_service = authenticate_google_calendar()
+        if not gcal_service:
+            print("Failed to authenticate with Google Calendar. Exiting.")
+            return
 
-    target_tz = pytz.timezone(TARGET_TIMEZONE_STR)
-    
-    # --- LOOP FOR N DAYS ---
-    for i in range(DAYS_TO_PROCESS_IN_ADVANCE):
-        # Determine the specific date for this iteration
-        current_processing_date = (datetime.now(target_tz) + timedelta(days=i)).date()
-        current_processing_date_str = current_processing_date.strftime('%Y-%m-%d')
-        
-        print(f"\n--- Processing for date: {current_processing_date_str} ---")
+        target_tz = pytz.timezone(TARGET_TIMEZONE_STR)
 
-        # 1. Get existing events for this specific day
-        existing_events_on_this_day = get_existing_prayer_events_for_day(gcal_service, current_processing_date, target_tz)
+        # --- LOOP FOR N DAYS ---
+        for i in range(DAYS_TO_PROCESS_IN_ADVANCE):
+            # Determine the specific date for this iteration
+            current_processing_date = (datetime.now(target_tz) + timedelta(days=i)).date()
+            current_processing_date_str = current_processing_date.strftime('%Y-%m-%d')
 
-        # 2. Scrape Prayer Times for this specific day
-        print(f"Scraping prayer times for {current_processing_date_str}...")
-        # Pass the specific date to the scraper
-        prayer_schedule_for_this_day = get_prayer_times_with_ends(target_date_obj_override=current_processing_date)
-        
-        if not prayer_schedule_for_this_day:
-            print(f"Failed to scrape prayer times for {current_processing_date_str}. Skipping this day.")
-            continue # Move to the next day in the loop
+            print(f"\n--- Processing for date: {current_processing_date_str} ---")
 
-        print(f"\nPrayer Schedule to Process for {current_processing_date_str}:")
-        for p, t in prayer_schedule_for_this_day.items():
-             print(f"  {p}: Start: {t.get('start')} on {t.get('date_for_start')}, End: {t.get('end')} on {t.get('date_for_end')}")
+            # 1. Get existing events for this specific day
+            existing_events_on_this_day = get_existing_prayer_events_for_day(gcal_service, current_processing_date, target_tz)
 
-        # 3. Process and Create/Update Events for this specific day
-        print(f"\nProcessing and creating/updating Google Calendar events for {current_processing_date_str}...")
-        for prayer_name, times_info in prayer_schedule_for_this_day.items():
-            start_time_str = times_info.get('start')
-            end_time_str = times_info.get('end')
-            # These dates should come correctly from the scraper for the current_processing_date
-            start_date_str = times_info.get('date_for_start') 
-            end_date_str = times_info.get('date_for_end')
+            # 2. Scrape Prayer Times for this specific day
+            print(f"Scraping prayer times for {current_processing_date_str}...")
+            # Pass the specific date to the scraper
+            prayer_schedule_for_this_day = get_prayer_times_with_ends(target_date_obj_override=current_processing_date)
 
-            if not all([start_time_str, end_time_str, start_date_str, end_date_str]):
-                print(f"Skipping {prayer_name} for {current_processing_date_str} due to missing time/date information.")
-                continue
-            
-            try:
-                start_datetime_naive = datetime.strptime(f"{start_date_str} {start_time_str}", "%Y-%m-%d %H:%M:%S")
-                end_datetime_naive = datetime.strptime(f"{end_date_str} {end_time_str}", "%Y-%m-%d %H:%M:%S")
-                start_datetime_aware = target_tz.localize(start_datetime_naive)
-                end_datetime_aware = target_tz.localize(end_datetime_naive)
-                
-                if end_datetime_aware <= start_datetime_aware:
-                    print(f"Warning: End time for {prayer_name} ({end_datetime_aware}) on {start_date_str} is not after start time ({start_datetime_aware}). Skipping.")
+            # If scraping was interrupted or failed (returned None), break the loop
+            if prayer_schedule_for_this_day is None:
+                print(f"Scraping for {current_processing_date_str} was interrupted or failed. Aborting further processing.")
+                break # Exit the loop immediately
+
+            if not prayer_schedule_for_this_day:
+                print(f"Failed to scrape prayer times for {current_processing_date_str}. Skipping this day.")
+                continue # Move to the next day in the loop
+
+            print(f"\nPrayer Schedule to Process for {current_processing_date_str}:")
+            for p, t in prayer_schedule_for_this_day.items():
+                 print(f"  {p}: Start: {t.get('start')} on {t.get('date_for_start')}, End: {t.get('end')} on {t.get('date_for_end')}")
+
+            # 3. Process and Create/Update Events for this specific day
+            print(f"\nProcessing and creating/updating Google Calendar events for {current_processing_date_str}...")
+            for prayer_name, times_info in prayer_schedule_for_this_day.items():
+                start_time_str = times_info.get('start')
+                end_time_str = times_info.get('end')
+                # These dates should come correctly from the scraper for the current_processing_date
+                start_date_str = times_info.get('date_for_start')
+                end_date_str = times_info.get('date_for_end')
+
+                if not all([start_time_str, end_time_str, start_date_str, end_date_str]):
+                    print(f"Skipping {prayer_name} for {current_processing_date_str} due to missing time/date information.")
                     continue
 
-                event_summary_key = f'{prayer_name} Prayer'
-                existing_event_to_update = existing_events_on_this_day.get(event_summary_key)
-                
-                create_or_update_prayer_event(
-                    gcal_service, 
-                    prayer_name, 
-                    start_datetime_aware, 
-                    end_datetime_aware, 
-                    start_date_str, # Date for description URL (should be same as current_processing_date_str or one day after for Isha end)
-                    target_tz,
-                    existing_event_data=existing_event_to_update
-                )
+                try:
+                    start_datetime_naive = datetime.strptime(f"{start_date_str} {start_time_str}", "%Y-%m-%d %H:%M:%S")
+                    end_datetime_naive = datetime.strptime(f"{end_date_str} {end_time_str}", "%Y-%m-%d %H:%M:%S")
+                    start_datetime_aware = target_tz.localize(start_datetime_naive)
+                    end_datetime_aware = target_tz.localize(end_datetime_naive)
 
-            except ValueError as ve:
-                print(f"Error parsing date/time for {prayer_name} on {current_processing_date_str}: {ve}.")
-            except Exception as e:
-                print(f"An unexpected error occurred while processing {prayer_name} on {current_processing_date_str}: {e}")
+                    if end_datetime_aware <= start_datetime_aware:
+                        print(f"Warning: End time for {prayer_name} ({end_datetime_aware}) on {start_date_str} is not after start time ({start_datetime_aware}). Skipping.")
+                        continue
+
+                    event_summary_key = f'{prayer_name} Prayer'
+                    existing_event_to_update = existing_events_on_this_day.get(event_summary_key)
+
+                    create_or_update_prayer_event(
+                        gcal_service,
+                        prayer_name,
+                        start_datetime_aware,
+                        end_datetime_aware,
+                        start_date_str, # Date for description URL (should be same as current_processing_date_str or one day after for Isha end)
+                        target_tz,
+                        existing_event_data=existing_event_to_update
+                    )
+
+                except ValueError as ve:
+                    print(f"Error parsing date/time for {prayer_name} on {current_processing_date_str}: {ve}.")
+                except Exception as e:
+                    print(f"An unexpected error occurred while processing {prayer_name} on {current_processing_date_str}: {e}")
+
+    except KeyboardInterrupt: # Catch Ctrl+C
+        print("\nProcess interrupted by user (Ctrl+C). Exiting gracefully.")
+        # sys.exit(0) is not strictly needed here as the program will terminate naturally.
+    except Exception as e: # Catch any other unexpected errors in main
+        print(f"\nAn unexpected error occurred in the main process: {e}")
+        sys.exit(1) # Exit with an error code
 
     print("\nPrayer Calendar Manager finished all processing days.")
 
