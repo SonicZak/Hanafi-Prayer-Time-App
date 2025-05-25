@@ -106,14 +106,17 @@ def get_prayer_times_with_ends(target_date_obj_override=None):
         url_to_scrape = f"{BASE_URL}&d={date_to_fetch_str}"
         print(f"Fetching times for date ({TARGET_TIMEZONE_STR}): {date_to_fetch_str}")
 
+        service = None # Initialize service to None
         if BRAVE_PATH and os.path.exists(BRAVE_PATH):
             print(f"Using Brave browser from: {BRAVE_PATH}")
             options.binary_location = BRAVE_PATH
-            driver = webdriver.Chrome(options=options)
+            service = ChromeService() # Default service, binary_location handled by options
         else:
             print("Setting up ChromeDriver using webdriver-manager (Brave path not specified or invalid)...")
             service = ChromeService(ChromeDriverManager().install())
-            driver = webdriver.Chrome(service=service, options=options)
+
+        # Now instantiate the driver using the prepared service and options
+        driver = webdriver.Chrome(service=service, options=options)
 
         driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT_SECONDS)
 
@@ -282,8 +285,8 @@ def get_prayer_times_with_ends(target_date_obj_override=None):
 
     return prayer_schedule
 
-
-if __name__ == '__main__':
+def _test_scraper_functionality():
+    """Helper function to test the scraper's direct functionality."""
     print("Attempting to scrape prayer times (defaulting to current Sydney date)...")
     schedule_today = get_prayer_times_with_ends()
     if schedule_today:
@@ -291,7 +294,7 @@ if __name__ == '__main__':
         for prayer, times in schedule_today.items():
             print(f"{prayer}: Start: {times.get('start')} on {times.get('date_for_start')}, End: {times.get('end')} on {times.get('date_for_end')}")
     else:
-        print("\nFailed to extract complete prayer schedule for today or process was interrupted.") # Updated message
+        print("\nFailed to extract complete prayer schedule for today or process was interrupted.")
 
     print("\nAttempting to scrape for a specific future date...")
     try:
@@ -300,11 +303,14 @@ if __name__ == '__main__':
         schedule_future = get_prayer_times_with_ends(target_date_obj_override=specific_date_to_test)
         if schedule_future:
             print(f"\n--- Extracted Prayer Schedule ({specific_date_to_test.strftime('%Y-%m-%d')}) ---")
-            for prayer, times in schedule_future.items():
+            for prayer, times in schedule_future.items(): # This line defines 'times'
                 print(f"{prayer}: Start: {times.get('start')} on {times.get('date_for_start')}, End: {times.get('end')} on {times.get('date_for_end')}")
         else:
-            print(f"\nFailed to extract complete prayer schedule for {specific_date_to_test.strftime('%Y-%m-%d')} or process was interrupted.") # Updated message
+            print(f"\nFailed to extract complete prayer schedule for {specific_date_to_test.strftime('%Y-%m-%d')} or process was interrupted.")
     except Exception as e_test:
         print(f"Error during future date test in __main__: {e_test}")
+
+if __name__ == '__main__':
+    _test_scraper_functionality()
 
 # --- END OF FILE scrape_prayer_times.py ---

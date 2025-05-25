@@ -148,49 +148,45 @@ def create_or_update_prayer_event(service, prayer_name, start_dt_aware, end_dt_a
 
 def main():
     print("Starting Prayer Calendar Manager...")
+    gcal_service = None # Initialize gcal_service outside try for broader scope if needed
+
     try:
         gcal_service = authenticate_google_calendar()
         if not gcal_service:
             print("Failed to authenticate with Google Calendar. Exiting.")
-            return
+            sys.exit(1) # Explicitly exit with an error code for authentication failure
 
         target_tz = pytz.timezone(TARGET_TIMEZONE_STR)
 
         # --- LOOP FOR N DAYS ---
         for i in range(DAYS_TO_PROCESS_IN_ADVANCE):
-            # Determine the specific date for this iteration
             current_processing_date = (datetime.now(target_tz) + timedelta(days=i)).date()
             current_processing_date_str = current_processing_date.strftime('%Y-%m-%d')
 
             print(f"\n--- Processing for date: {current_processing_date_str} ---")
 
-            # 1. Get existing events for this specific day
             existing_events_on_this_day = get_existing_prayer_events_for_day(gcal_service, current_processing_date, target_tz)
 
-            # 2. Scrape Prayer Times for this specific day
             print(f"Scraping prayer times for {current_processing_date_str}...")
-            # Pass the specific date to the scraper
             prayer_schedule_for_this_day = get_prayer_times_with_ends(target_date_obj_override=current_processing_date)
 
-            # If scraping was interrupted or failed (returned None), break the loop
             if prayer_schedule_for_this_day is None:
+                # get_prayer_times_with_ends returns None on KeyboardInterrupt or other specific internal failures
                 print(f"Scraping for {current_processing_date_str} was interrupted or failed. Aborting further processing.")
-                break # Exit the loop immediately
+                sys.exit(1) # Signal an abnormal exit due to interruption/failure in scraper
 
             if not prayer_schedule_for_this_day:
                 print(f"Failed to scrape prayer times for {current_processing_date_str}. Skipping this day.")
-                continue # Move to the next day in the loop
+                continue
 
             print(f"\nPrayer Schedule to Process for {current_processing_date_str}:")
             for p, t in prayer_schedule_for_this_day.items():
                  print(f"  {p}: Start: {t.get('start')} on {t.get('date_for_start')}, End: {t.get('end')} on {t.get('date_for_end')}")
 
-            # 3. Process and Create/Update Events for this specific day
             print(f"\nProcessing and creating/updating Google Calendar events for {current_processing_date_str}...")
             for prayer_name, times_info in prayer_schedule_for_this_day.items():
                 start_time_str = times_info.get('start')
                 end_time_str = times_info.get('end')
-                # These dates should come correctly from the scraper for the current_processing_date
                 start_date_str = times_info.get('date_for_start')
                 end_date_str = times_info.get('date_for_end')
 
@@ -216,7 +212,7 @@ def main():
                         prayer_name,
                         start_datetime_aware,
                         end_datetime_aware,
-                        start_date_str, # Date for description URL (should be same as current_processing_date_str or one day after for Isha end)
+                        start_date_str,
                         target_tz,
                         existing_event_data=existing_event_to_update
                     )
@@ -226,14 +222,17 @@ def main():
                 except Exception as e:
                     print(f"An unexpected error occurred while processing {prayer_name} on {current_processing_date_str}: {e}")
 
-    except KeyboardInterrupt: # Catch Ctrl+C
+    except KeyboardInterrupt:
         print("\nProcess interrupted by user (Ctrl+C). Exiting gracefully.")
-        # sys.exit(0) is not strictly needed here as the program will terminate naturally.
+        sys.exit(0) # Explicitly exit with success code (0) for graceful termination
+
     except Exception as e: # Catch any other unexpected errors in main
         print(f"\nAn unexpected error occurred in the main process: {e}")
-        sys.exit(1) # Exit with an error code
+        # Optional: import traceback and traceback.print_exc() if you want stack trace for unhandled errors
+        sys.exit(1) # Exit with an error code for unhandled exceptions
 
     print("\nPrayer Calendar Manager finished all processing days.")
+    sys.exit(0) # Explicitly exit with success code (0) on normal completion
 
 if __name__ == '__main__':
     main()
