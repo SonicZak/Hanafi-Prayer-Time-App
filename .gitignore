@@ -16,6 +16,10 @@ token.json
 # Batch files
 *.bat
 
+# Batch Logging Files
+run_log.txt
+unexpected_scraper_error_page_source.html
+
 # Distribution / packaging
 .Python
 build/
