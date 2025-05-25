@@ -28,7 +28,7 @@ A Python application designed to automate the process of fetching daily prayer t
 *   **Duplicate Prevention & Updates:** Intelligently checks for existing events to avoid duplicates and updates event times if they change (e.g., due to daylight saving adjustments).
 *   **Configurable Processing Window:** Processes prayer times for multiple days in advance (e.g., the next 7 days) to keep your calendar proactive.
 *   **Customizable Timeouts:** Allows configuration of page load and overall process timeouts for robust web scraping.
-*   **Error Handling:** Includes robust error handling for network issues, website changes, and API errors, saving page source on scraper errors for debugging.
+*   **Robust Error Handling:** Includes robust error handling for network issues, website changes, and API errors, saving page source on scraper errors for debugging.
 *   **Headless Browser Support:** Runs Selenium in headless mode by default, meaning no browser window will pop up during execution.
 
 ## How It Works
@@ -41,7 +41,7 @@ The application operates in a sequence of steps:
     *   **Existing Event Check:** Queries the Google Calendar for any already existing prayer events for the current day being processed.
     *   **Web Scraping:** Uses Selenium to visit the configured prayer time website for the specific date. It extracts the start and end times for each prayer, handling potential date offsets (e.g., if a prayer's end time falls on the next day).
     *   **Calendar Synchronization:** Compares the scraped times with existing calendar events. It creates new events if none exist or updates existing ones if the times have changed.
-4.  **Completion:** The process repeats for all specified days, ensuring your calendar is synchronized.
+4.  **Robust Completion & Interruption:** The process intelligently repeats for all specified days, ensuring your calendar is synchronized.
 
 ## Getting Started
 
@@ -52,7 +52,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 *   **Python 3.x:** Ensure you have Python installed. You can download it from [python.org](https://www.python.org/downloads/).
 *   **Git:** For cloning the repository. Download from [git-scm.com](https://git-scm.com/downloads).
 *   **Google Account:** A Google account with Google Calendar enabled to manage events.
-*   **Google Chrome or Brave Browser:** The application uses Selenium to automate a web browser. You'll need either Google Chrome or Brave Browser installed. If using Brave, its executable path must be configured.
+*   **Google Chrome or Brave Browser:** The application uses Selenium to automate a web browser. You'll need either Google Chrome or Brave Browser installed. The appropriate ChromeDriver is automatically managed by `webdriver-manager`. If using Brave, its executable path must be configured in `config.json`.
 
 ### Installation
 
@@ -147,6 +147,8 @@ The application will then proceed to authenticate, scrape prayer times, and upda
 *   **Improved Error Reporting:** Implement logging to a file or integrate with monitoring services for more robust error tracking.
 *   **Command Line Arguments:** Add command-line arguments for easier ad-hoc execution or overrides without editing `config.json`.
 *   **Unit/Integration Tests:** Add automated tests to ensure reliability of scraping and API interactions.
+*   **Structured Logging:** Implement Python's `logging` module for more detailed, categorized, and configurable output to files or console.
+*   **Retry Logic:** Add retry mechanisms with exponential backoff for transient network or website issues during scraping.
 
 ## License
 
