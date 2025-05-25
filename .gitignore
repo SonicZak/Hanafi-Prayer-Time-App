@@ -13,8 +13,8 @@ chromedriver-win64/
 credentials.json
 token.json
 
-# Batch files
-*.bat
+# # Batch files
+# *.bat
 
 # Batch Logging Files
 run_log.txt
