@@ -99,7 +99,7 @@ Follow these instructions to get a copy of the project up and running on your lo
     ```
     *(This will install `google-api-python-client`, `google-auth-oauthlib`, `google-auth-httplib2`, `selenium`, `webdriver-manager`, `pytz`, `requests`, and `geopy`.)*
 
-### Google API Setup
+### Google API Setup (only for Developers/Contributers)
 
 This project uses the Google Calendar API. You need to enable the API and download your credentials:
 
