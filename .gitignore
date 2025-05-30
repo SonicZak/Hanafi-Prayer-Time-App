@@ -13,6 +13,9 @@ chromedriver-win64/
 credentials.json
 token.json
 
+# Personal Config does not need to be uploaded to git
+config.json
+
 # Batch Logging Files
 run_log.txt
 .html
