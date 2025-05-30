@@ -1,0 +1,37 @@
+{
+    "brave_path": "",
+    "calendar_id": "",
+    "target_timezone": "Australia/Sydney",
+    "event_reminder_minutes": 5,
+
+    "user_location_address": "",
+    "location_check_enabled": true,
+    "location_threshold_km": 20.0,
+    "last_checked_ip": null,
+    "last_checked_latitude": null,
+    "last_checked_longitude": null,
+    "last_checked_timezone": null,
+
+    "muwaqqit_base_url": "https://www.muwaqqit.com/index?diptype=apparent&dn=&ea=-19.0&eh=33.0&ehtype=observer&eo=33.0&era=-16.0&fa=-19.0&fea=1.0&ia=4.5&isn=-10.0&isna=1.0&k=0.155&p=1010.0&q=&rsa=1.0&t=15.0&tztype=auto&vc=5.65&z=17&zt=1.0",
+    "prayer_definitions": {
+        "Fajr":    {"start_text": "Fajr",                       "end_text": "Shurūq/Sunrise"},
+        "Zuhr":    {"start_text": "Ẓuhr",                       "end_text": "ʿAṣr al-Mithl al‑Thānī"},
+        "Asr":     {"start_text": "ʿAṣr al-Mithl al‑Thānī",      "end_text": "Karāhah"},
+        "Maghrib": {"start_text": "Maghrib/Sunset",             "end_text": "Ishtibāk al‑Nujūm"},
+        "Isha":    {"start_text": "ʿIshāʾ al-Shafaq al-Abyaḍ",    "end_text": "Half sharʿī night"}
+    },
+    "managed_prayer_names": ["Fajr", "Zuhr", "Asr", "Maghrib", "Isha"],
+    "timeouts": {
+        "overall_process_seconds": 60.0,
+        "page_load_seconds": 25.0,
+        "additional_delay_seconds": 5.0
+    },
+    "google_auth": {
+        "token_path": "token.json",
+        "credentials_path": "credentials.json",
+        "scopes": ["https://www.googleapis.com/auth/calendar"],
+        "redirect_uri": "https://localhost:8080/",
+        "server_port": 8080
+    },
+    "processing_days_in_advance": 2
+}
