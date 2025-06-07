@@ -6,8 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
-# ChromeDriver executable
-chromedriver-win64/
+# Webdriver-Manager
+.wdm/
 
 # Sensitive Google API files
 credentials.json
@@ -18,7 +18,7 @@ config.json
 
 # Batch Logging Files
 run_log.txt
-.html
+*.html
 
 # Distribution / packaging
 .Python

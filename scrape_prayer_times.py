@@ -73,6 +73,16 @@ def get_prayer_times_with_ends(target_date_obj_override=None, location_params=No
     """
     options = Options()
     options.add_argument("--headless")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--disable-browser-side-navigation")
+    options.add_argument("--disable-setuid-sandbox")
+    options.add_argument("--disable-infobars")
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36")
     options.add_argument("--log-level=3")
 
     driver = None
@@ -80,6 +90,7 @@ def get_prayer_times_with_ends(target_date_obj_override=None, location_params=No
         prayer_key: {"start": None, "end": None, "start_date_offset": 0, "end_date_offset": 0, "date_for_start": None, "date_for_end": None}
         for prayer_key in PRAYER_DEFINITIONS.keys()
     } if PRAYER_DEFINITIONS else {}
+    all_times_found = False # Initialize it to False by default
     scraped_times_raw = {label: None for label in ALL_TIME_LABELS_TO_SCRAPE}
     function_start_time = time.time()
 
