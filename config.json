@@ -1,14 +1,14 @@
 {
     "brave_path": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe",
-    "calendar_id": "7995574435af48d968ca2a79e79a8299af33cb9140eec25fd363af2c0c652f55@group.calendar.google.com",
+    "calendar_id": "",
     "target_timezone": "Australia/Sydney",
     "event_reminder_minutes": 5,
-    "user_location_address": "1-3 Kennington Oval, Auburn NSW 2144, Australia",
+    "user_location_address": "",
     "location_check_enabled": true,
     "location_threshold_km": 10.0,
     "last_checked_ip": "",
-    "last_checked_latitude": -33.7342,
-    "last_checked_longitude": 150.8801,
+    "last_checked_latitude": null,
+    "last_checked_longitude": null,
     "last_checked_timezone": "Australia/Sydney",
     "muwaqqit_base_url": "https://www.muwaqqit.com/index?diptype=apparent&dn=&ea=-19.0&eh=33.0&ehtype=observer&eo=33.0&era=-16.0&fa=-19.0&fea=1.0&ia=4.5&isn=-10.0&isna=1.0&k=0.155&p=1010.0&q=&rsa=1.0&t=15.0&tztype=auto&vc=5.65&z=17&zt=1.0",
     "prayer_definitions": {
