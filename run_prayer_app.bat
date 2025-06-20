@@ -21,9 +21,9 @@ CALL "%VENV_ACTIVATE%" >> "%LOG_FILE%" 2>&1
 
 REM Run your Python script and capture its exit code
 ECHO %DATE% %TIME% Starting Prayer Calendar Manager... >> "%LOG_FILE%" 2>&1
-python "%PYTHON_SCRIPT%" | FINDSTR /V "^DevTools listening on" >> "%LOG_FILE%" 2>&1
-REM Alternative (simpler, but keeps all output including DevTools messages):
-REM python "%PYTHON_SCRIPT%" > "%LOG_FILE%" 2>&1
+python "%PYTHON_SCRIPT%" >> "%LOG_FILE%" 2>&1
+REM The alternative line below is now the active one, no longer commented out:
+REM python "%PYTHON_SCRIPT%" > "%LOG_FILE%" 2>&1  <-- This was the alternative line, now used directly above.
 SET PYTHON_EXIT_CODE=%ERRORLEVEL%
 ECHO %DATE% %TIME% Prayer Calendar Manager finished with exit code %PYTHON_EXIT_CODE%. >> "%LOG_FILE%" 2>&1
 
